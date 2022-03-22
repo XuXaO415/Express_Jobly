@@ -35,7 +35,7 @@ afterAll(commonAfterAll);
 // });
 
 describe("sqlForPartialUpdate", function() {
-    test("tests if user has email", async function() {
+    test("tests if user has email", function() {
         const users = {
             username: "testUser1",
             first_name: "Rick",
@@ -48,6 +48,17 @@ describe("sqlForPartialUpdate", function() {
         expect(output).toEqual({
             setCols: "\"email\"=$1",
             values: ["u1@email.com"]
-        })
+        });
+    });
+    test("No data, should throw a 400 error", function() {
+        try {
+            const keys = {};
+            const data = {};
+            const output = sqlForPartialUpdate(keys, data);
+            expect(output).toBeDefined();
+            expect(output).toBeFalsy();
+        } catch (e) {
+            expect(sqlForPartialUpdate).toBeTruthy();
+        }
     });
 });

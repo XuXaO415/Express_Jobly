@@ -5,7 +5,7 @@ const { BadRequestError } = require("../expressError");
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
     //enumerates through updatable data objects/properties in db i.e company, jobs
     const keys = Object.keys(dataToUpdate);
-    // if keys are empty, throw error that states no data (ex: applications in db is empty, this would throw an error)
+    // if keys are empty, throw error that states no data (ex: applications in db is empty, this would throw an 400 error)
     if (keys.length === 0) throw new BadRequestError("No data");
 
     // {firstName: 'Aliya', age: 32} => ['"first_name"=$1', '"age"=$2']
