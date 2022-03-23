@@ -25,15 +25,17 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 
 function sqlCompanyFilter(filter) {
     // if company query filter is left blank, throw error stating query[input] is missing
-    if (!filter === Object.keys(filter).length === 0) throw new BadRequestError("Query missing");
+    if (!filter || Object.keys(filter).length === 0) return "";
     const { minEmployees, maxEmployees, nameLike } = filter;
     const filterArr = [];
-    if (filter) {
-        filterArr.push(`name === '${nameLike}'`);
-    } else if (filter === 'minEmployees') {
-        filterArr.push(`numEmployees >= ${minEmployees}`);
-    } else if (filter === 'maxEmployees') {
-        filterArr.push(`numEmployees <= ${maxEmployees}`);
+    if (minEmployees) {
+        filterArr.push(`num_employees >= ${minEmployees}`);
+    }
+    if (maxEmployees) {
+        filterArr.push(`num_employees <= ${maxEmployees}`);
+    }
+    if (nameLike) {
+        filterArr.push(`name '%${nameLike}%'`);
     }
     return `WHERE ${filterArr.join(" AND ")}`;
 }

@@ -5,12 +5,13 @@
 const jsonschema = require("jsonschema");
 const express = require("express");
 
-const { BadRequestError } = require("../expressError");
+const { BadRequestError, ExpressError } = require("../expressError");
 const { ensureLoggedIn } = require("../middleware/auth");
 const Company = require("../models/company");
 
 const companyNewSchema = require("../schemas/companyNew.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");
+const companyFilterSchema = require("../schemas/companyFilter.json");
 const db = require("../db");
 
 const router = new express.Router();
@@ -55,15 +56,20 @@ router.post("/", ensureLoggedIn, async function(req, res, next) {
 
 router.get("/", async function(req, res, next) {
     try {
-        let companies;
         const filter = req.query;
-        const { minEmployees, maxEmployees, nameLike } = req.query;
-        if (!minEmployees && maxEmployees && !nameLike) {
-            companies = await Company.findAll(filter);
-        } else {
-            //this doesn't work
-            // companies = await Company.update(req.query);
+        if (filter.minEmployees) {
+            filter.minEmployees = (+filter.minEmployees);
+        };
+        if (filter.maxEmployees) {
+            filter.maxEmployees = (+filter.maxEmployees);
+        };
+        const validator = jsonschema.validate(filter, companyFilterSchema);
+        if (!validator.valid) {
+            const errs = validator.errors.map(e => e.stack);
+            const e = new ExpressError(errs, 400);
+            // throw new BadRequestError(errs);
         }
+        const companies = await Company.findAll(filter);
         return res.json({ companies });
     } catch (err) {
         return next(err);
