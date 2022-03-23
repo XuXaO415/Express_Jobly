@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError, ExpressError } = require("../expressError");
-const { ensureLoggedIn } = require("../middleware/auth");
+const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 const Company = require("../models/company");
 
 const companyNewSchema = require("../schemas/companyNew.json");
@@ -64,10 +64,11 @@ router.get("/", async function(req, res, next) {
             filter.maxEmployees = (+filter.maxEmployees);
         };
         const validator = jsonschema.validate(filter, companyFilterSchema);
+        // pass validation errors to error-handler
         if (!validator.valid) {
             const errs = validator.errors.map(e => e.stack);
             const e = new ExpressError(errs, 400);
-            // throw new BadRequestError(errs);
+
         }
         const companies = await Company.findAll(filter);
         return res.json({ companies });
@@ -104,7 +105,7 @@ router.get("/:handle", async function(req, res, next) {
  * Authorization required: login
  */
 
-router.patch("/:handle", ensureLoggedIn, async function(req, res, next) {
+router.patch("/:handle", ensureLoggedIn, ensureAdmin, async function(req, res, next) {
     try {
         const validator = jsonschema.validate(req.body, companyUpdateSchema);
         if (!validator.valid) {
@@ -124,7 +125,7 @@ router.patch("/:handle", ensureLoggedIn, async function(req, res, next) {
  * Authorization: login
  */
 
-router.delete("/:handle", ensureLoggedIn, async function(req, res, next) {
+router.delete("/:handle", ensureLoggedIn, ensureAdmin, async function(req, res, next) {
     try {
         await Company.remove(req.params.handle);
         return res.json({ deleted: req.params.handle });

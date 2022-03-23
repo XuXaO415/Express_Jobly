@@ -12,6 +12,7 @@ const {
     commonAfterAll,
     u1Token,
 } = require("./_testCommon");
+const { async } = require("../models/company");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -169,6 +170,17 @@ describe("PATCH /companies/:handle", function() {
                 name: "C1-new",
             });
         expect(resp.statusCode).toEqual(401);
+    });
+
+    /** Added this test */
+    test("unauth admin status", async function() {
+        const resp = await request(app)
+            .patch(`/companies/c1`)
+            .send({
+                name: "C1-new",
+            })
+            .set("authorization", `Bearer${u1Token}`);
+        expect(resp.statusCode).toEqual(404);
     });
 
     test("not found on no such company", async function() {
