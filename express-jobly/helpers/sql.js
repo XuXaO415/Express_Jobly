@@ -23,4 +23,20 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
     };
 }
 
-module.exports = { sqlForPartialUpdate };
+function sqlCompanyFilter(filter) {
+    // if company query filter is left blank, throw error stating query[input] is missing
+    if (!filter === Object.keys(filter).length === 0) throw new BadRequestError("Query missing");
+    const { minEmployees, maxEmployees, nameLike } = filter;
+    const filterArr = [];
+    if (filter) {
+        filterArr.push(`name === '${nameLike}'`);
+    } else if (filter === 'minEmployees') {
+        filterArr.push(`numEmployees >= ${minEmployees}`);
+    } else if (filter === 'maxEmployees') {
+        filterArr.push(`numEmployees <= ${maxEmployees}`);
+    }
+    return `WHERE ${filterArr.join(" AND ")}`;
+}
+
+
+module.exports = { sqlForPartialUpdate, sqlCompanyFilter };
