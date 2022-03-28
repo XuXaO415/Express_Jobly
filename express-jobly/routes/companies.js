@@ -54,23 +54,38 @@ router.post("/", ensureLoggedIn, async function(req, res, next) {
  * ** ADD a feature that allows a user to filter the results based on optional filtering criteria...look at lines 45-48 **
  */
 
+
+// router.get("/", async function(req, res, next) {
+//     try {
+//         const filter = req.query;
+//         if (filter.minEmployees) {
+//             filter.minEmployees = (+filter.minEmployees);
+//         };
+//         if (filter.maxEmployees) {
+//             filter.maxEmployees = (+filter.maxEmployees);
+//         };
+//         const validator = jsonschema.validate(filter, companyFilterSchema);
+//         // pass validation errors to error-handler
+//         if (!validator.valid) {
+//             const errs = validator.errors.map(e => e.stack);
+//             throw new BadRequestError(errs);
+
+//         }
+//         const companies = await Company.findAll(filter);
+//         return res.json({ companies });
+//     } catch (err) {
+//         return next(err);
+//     }
+//});
 router.get("/", async function(req, res, next) {
     try {
-        const filter = req.query;
-        if (filter.minEmployees) {
-            filter.minEmployees = (+filter.minEmployees);
-        };
-        if (filter.maxEmployees) {
-            filter.maxEmployees = (+filter.maxEmployees);
-        };
-        const validator = jsonschema.validate(filter, companyFilterSchema);
-        // pass validation errors to error-handler
-        if (!validator.valid) {
-            const errs = validator.errors.map(e => e.stack);
-            const e = new ExpressError(errs, 400);
-
+        let companies;
+        const { minEmployees, maxEmployees, nameLike } = req.query;
+        if (!minEmployees && !maxEmployees && !nameLike) {
+            companies = await Company.findAll(req.query);
+        } else {
+            companies = await Company.findAll(filter);
         }
-        const companies = await Company.findAll(filter);
         return res.json({ companies });
     } catch (err) {
         return next(err);
