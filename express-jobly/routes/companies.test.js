@@ -124,7 +124,28 @@ describe("GET /companies", function() {
         });
         const response = await request(app).get("/companies?name=net");
         expect(response.body).toBe({
-            companies: []
+            companies: [],
+        });
+    });
+    // GET /companies?minEmployees=2
+    test("test filter minEmployees", async function() {
+        const resp = await request(app).get("/companies?minEmployees=2");
+        expect(resp.body).toBe({
+            companies: [{
+                    handle: "c2",
+                    name: "C2",
+                    description: "Desc2",
+                    numEmployees: 2,
+                    logoUrl: "http://c2.img",
+                },
+                {
+                    handle: "c3",
+                    name: "C3",
+                    description: "Desc3",
+                    numEmployees: 3,
+                    logoUrl: "http://c3.img",
+                },
+            ],
         });
     });
 
