@@ -132,7 +132,7 @@ describe("GET /users", function() {
                     firstName: "U2F",
                     lastName: "U2L",
                     email: "user2@user.com",
-                    isAdmin: false,
+                    isAdmin: true,
                 },
                 {
                     username: "u3",

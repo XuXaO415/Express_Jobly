@@ -95,6 +95,38 @@ describe("GET /companies", function() {
             ],
         });
     });
+    // Test is failing, returns object and not an array. FIX THIS => in findAll
+    test("test name filtering capabilities", async function() {
+        const resp = await request(app).get("/companies?name=C");
+        expect(resp.body).toContain({
+            companies: [{
+                    handle: "c1",
+                    name: "C1",
+                    description: "Desc1",
+                    numEmployees: 1,
+                    logoUrl: "http://c1.img",
+                },
+                {
+                    handle: "c2",
+                    name: "C2",
+                    description: "Desc2",
+                    numEmployees: 2,
+                    logoUrl: "http://c2.img",
+                },
+                {
+                    handle: "c3",
+                    name: "C3",
+                    description: "Desc3",
+                    numEmployees: 3,
+                    logoUrl: "http://c3.img",
+                },
+            ],
+        });
+        const response = await request(app).get("/companies?name=net");
+        expect(response.body).toBe({
+            companies: []
+        });
+    });
 
     test("fails: test next() handler", async function() {
         // there's no normal failure event which will cause this route to fail ---
@@ -109,7 +141,7 @@ describe("GET /companies", function() {
 });
 
 /************************************** GET /companies/:handle */
-
+// Works http://localhost:3001/companies/anderson-arias-morrow
 describe("GET /companies/:handle", function() {
     test("works for anon", async function() {
         const resp = await request(app).get(`/companies/c1`);

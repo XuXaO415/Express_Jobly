@@ -24,7 +24,7 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 }
 
 function sqlCompanyFilter(filter) {
-    // if company query filter is left blank, throw error stating query[input] is missing
+    // if company query filter is left blank, throw 400 error 
     if (!filter || Object.keys(filter).length === 0) return "";
     const { minEmployees, maxEmployees, name } = filter;
     const filterArr = [];
