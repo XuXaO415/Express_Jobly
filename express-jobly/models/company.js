@@ -44,6 +44,7 @@ class Company {
 
     static async findAll(filter) {
         const queryFilter = sqlCompanyFilter(filter);
+        console.log(queryFilter);
         const companiesRes = await db.query(
             `SELECT handle,
                   name,
