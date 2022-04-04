@@ -97,8 +97,8 @@ describe("GET /companies", function() {
     });
     // Test is failing, returns object and not an array. FIX THIS => in findAll
     test("test name filtering capabilities", async function() {
-        const resp = await request(app).get("/companies?name=C");
-        expect(resp.body).toContain({
+        const resp = await request(app).get("/companies?name=c");
+        expect(resp.body).toEqual({
             companies: [{
                     handle: "c1",
                     name: "C1",
@@ -123,14 +123,14 @@ describe("GET /companies", function() {
             ],
         });
         const response = await request(app).get("/companies?name=net");
-        expect(response.body).toBe({
+        expect(response.body).toEqual({
             companies: [],
         });
     });
     // GET /companies?minEmployees=2
     test("test filter minEmployees", async function() {
         const resp = await request(app).get("/companies?minEmployees=2");
-        expect(resp.body).toBe({
+        expect(resp.body).toEqual({
             companies: [{
                     handle: "c2",
                     name: "C2",
