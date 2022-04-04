@@ -72,7 +72,7 @@ router.get("/", async function(req, res, next) {
 
         }
         const companies = await Company.findAll(filter);
-        return res.json({ companies, filter });
+        return res.json({ companies });
     } catch (err) {
         return next(err);
     }

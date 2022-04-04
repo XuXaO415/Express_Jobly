@@ -23,10 +23,13 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
     };
 }
 
-function sqlCompanyFilter(filter) {
-    // if company query filter is left blank, throw 400 error 
-    if (!filter || Object.keys(filter).length === 0) return "";
+function sqlCompanyFilter(filter = {}) {
     const { minEmployees, maxEmployees, name } = filter;
+    if (!filter || Object.keys(filter).length === 0) return "";
+    // if (!filter || Object.keys(filter).length === 0) throw new BadRequestError(err);
+
+    if (minEmployees > maxEmployees)
+        throw BadRequestError("Min employees cannot be greater than max");
     const filterArr = [];
     if (minEmployees) {
         filterArr.push(`num_employees >= ${minEmployees}`);
