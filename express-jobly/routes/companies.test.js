@@ -128,7 +128,7 @@ describe("GET /companies", function() {
         });
     });
     // GET /companies?minEmployees=2
-    test("test filter minEmployees", async function() {
+    test("test filter minEmployees capabilities", async function() {
         const resp = await request(app).get("/companies?minEmployees=2");
         expect(resp.body).toEqual({
             companies: [{
@@ -148,6 +148,33 @@ describe("GET /companies", function() {
             ],
         });
     });
+    test("test filter maxEmployees capabilities", async function() {
+        const resp = await request(app).get("/companies?maxEmployees=2");
+        expect(resp.body).toEqual({
+            companies: [{
+                    handle: "c1",
+                    name: "C1",
+                    description: "Desc1",
+                    numEmployees: 1,
+                    logoUrl: "http://c1.img",
+                },
+                {
+                    handle: "c2",
+                    name: "C2",
+                    description: "Desc2",
+                    numEmployees: 2,
+                    logoUrl: "http://c2.img",
+                }
+            ],
+        });
+    });
+    test("test minEmployees && maxEmployees are not integers, throw 400 bad request error", async function() {
+        const resp = await request(app).get("/companies?minEmployees=abc");
+        expect(resp.statusCode).toEqual(400);
+        const res = await request(app).get("/companies?maxEmployees=@dfg152.44");
+        expect(res.statusCode).toEqual(400);
+    });
+
 
     test("fails: test next() handler", async function() {
         // there's no normal failure event which will cause this route to fail ---
