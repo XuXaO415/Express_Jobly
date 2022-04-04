@@ -38,7 +38,7 @@ function sqlCompanyFilter(filter = {}) {
         filterArr.push(`num_employees <= ${maxEmployees}`);
     }
     if (name) {
-        filterArr.push(`name ILIKE '%${name}%'`);
+        filterArr.push(`name ILIKE ${name}`);
     }
     return `WHERE ${filterArr.join(" AND ")}`;
 }

@@ -54,9 +54,27 @@ function ensureAdmin(req, res, next) {
         return next(err);
     }
 }
+/** Middleware to use when user must be logged in or admin in order to modify their data .
+ * 
+ *  
+ */
+
+function ensureUserOrAdminCredentials(req, res, next) {
+    try {
+        const userSession = res.locals.user.username;
+        const admin = res.locals.user.isAdmin;
+        //parameter becomes keys in an our object
+        const reqParams = req.params.username;
+        if (!userSession && !admin !== reqParams) throw new UnauthorizedError();
+        return next();
+    } catch (err) {
+        return next(err);
+    }
+}
 
 module.exports = {
     authenticateJWT,
     ensureLoggedIn,
-    ensureAdmin
+    ensureAdmin,
+    ensureUserOrAdminCredentials
 };
