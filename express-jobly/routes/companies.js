@@ -58,12 +58,11 @@ router.post("/", ensureLoggedIn, async function(req, res, next) {
 router.get("/", async function(req, res, next) {
     try {
         const filter = req.query;
-        if (filter.minEmployees) {
-            filter.minEmployees = (+filter.minEmployees);
-        };
-        if (filter.maxEmployees) {
-            filter.maxEmployees = (+filter.maxEmployees);
-        };
+        if (filter.minEmployees !== undefined) filter.minEmployees = +filter.minEmployees;
+        // if (filter.maxEmployees) {
+        //     filter.maxEmployees = (+filter.maxEmployees);
+        // };
+        if (filter.maxEmployees !== undefined) filter.maxEmployees = +filter.maxEmployees;
         const validator = jsonschema.validate(filter, companyFilterSchema);
         // pass validation errors to error-handler
         if (!validator.valid) {
