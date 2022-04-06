@@ -23,7 +23,8 @@ class Job {
             (title, salary, equity, companyHandle)
             VALUES($1, $2, $3, $4)
             RETURNING id, title, salary, equity, company_handle AS "companyHandle"`,
-            [data.title,
+            [
+            data.title,
             data.salary,
             data.equity,
             data.companyHandle
@@ -31,4 +32,29 @@ class Job {
             const job = result.rows[0];
             return job;
     }
+    /** Updates job data with`data`.
+    
+    This is a "partial update" --- acceptable if data doesn't contain all the fields;
+    this only changes provides ones.
+    
+    Data can include: {title, salary, equity } 
+    Returns {id, title, salary, equity, companyHandle }
+    
+    Throws NotFoundError if not found. 
+    
+    */
+   static async update(data, id) {
+       const{setCols, values} = sqlForPartialUpdate(data, {});
+       const idVarIdx = "$" + (values.length + 1);
+       const querySql = `UPDATE jobs
+       SET ${setCols}
+       WHERE id = ${idVarIdx}
+       RETURNING id, title, salary, equity, company_handle AS "companyHandle"`;
+       const result = await = await db.query(querySql, [...values, id]);
+       const job = result.rows[0];
+       if(!jobs) throw new NotFoundError(`Job: ${id} cannot be found`);
+       return job;
+   }
 }
+
+module.exports = Job;
