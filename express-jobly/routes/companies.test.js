@@ -97,7 +97,7 @@ describe("GET /companies", function() {
     });
     // Test is failing, returns object and not an array. FIX THIS => in findAll
     test("test name filtering capabilities", async function() {
-        const resp = await request(app).get("/companies?name=c");
+        const resp = await request(app).get("/companies?name=C");
         expect(resp.body).toEqual({
             companies: [{
                     handle: "c1",

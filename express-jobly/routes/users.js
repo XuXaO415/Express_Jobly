@@ -30,7 +30,7 @@ const router = express.Router();
  * I realized that the questions is asking only admins can add a new user; GOT IT!
  **/
 
-router.post("/", ensureAdmin, async function(req, res, next) {
+router.post("/", ensureAdmin, ensureLoggedIn, async function(req, res, next) {
     try {
         const validator = jsonschema.validate(req.body, userNewSchema);
         if (!validator.valid) {
@@ -51,11 +51,11 @@ router.post("/", ensureAdmin, async function(req, res, next) {
  *
  * Returns list of all users.
  *
- * Changed authorization; Getting the list of all users should only be permitted by admins.
- * Authorization required: admin
+ * Changed authorization; Getting the list of all users should only be permitted by admins and those logged in.
+ * Authorization required: admin, login
  **/
 
-router.get("/", ensureAdmin, async function(req, res, next) {
+router.get("/", ensureAdmin, ensureLoggedIn, async function(req, res, next) {
     try {
         const users = await User.findAll();
         return res.json({ users });
@@ -69,11 +69,11 @@ router.get("/", ensureAdmin, async function(req, res, next) {
  *
  * Returns { username, firstName, lastName, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: login, admin
  * users?username=xxx
  **/
 
-router.get("/:username", ensureUserOrAdminCredentials, async function(req, res, next) {
+router.get("/:username", ensureUserOrAdminCredentials, ensureLoggedIn, async function(req, res, next) {
     try {
         const user = await User.get(req.params.username);
         return res.json({ user });
@@ -93,7 +93,7 @@ router.get("/:username", ensureUserOrAdminCredentials, async function(req, res, 
  * Authorization required: login
  **/
 
-router.patch("/:username", ensureLoggedIn, async function(req, res, next) {
+router.patch("/:username", ensureLoggedIn, ensureUserOrAdminCredentials, async function(req, res, next) {
     try {
         const validator = jsonschema.validate(req.body, userUpdateSchema);
         if (!validator.valid) {
@@ -111,7 +111,7 @@ router.patch("/:username", ensureLoggedIn, async function(req, res, next) {
 
 /** DELETE /[username]  =>  { deleted: username }
  *
- * Authorization required: login
+ * Authorization required: login, admin
  **/
 
 router.delete("/:username", ensureLoggedIn, async function(req, res, next) {
