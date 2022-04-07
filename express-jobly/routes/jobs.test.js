@@ -96,9 +96,9 @@ describe("GET /jobs", function() {
             ],
         });
     });
+
     test("filter by title", async function() {
-        const res = await request(app)
-            .get(`/jobs?title=j1`);
+        const res = await request(app).get(`/jobs?title=j1`);
         expect(res.body).toEqual({
             jobs: [{
                 id: expect.any(Number),
@@ -107,8 +107,43 @@ describe("GET /jobs", function() {
                 equity: "3.14",
                 companyHandle: "c1",
                 companyName: "C1",
+            }, ],
+        });
+    });
+
+    test("filter for minSalary", async function() {
+        const res = await request(app)
+            .get(`/jobs?minSalary=2454`);
+        expect(res.body).toEqual({
+            jobs: [{
+                id: expect.any(Number),
+                title: "J2",
+                salary: 2,
+                equity: "0.2",
+                companyHandle: "c1",
+                companyName: "C1",
             }],
         });
+    });
 
-    })
+    test("filter hasEquity", async function() {
+        const res = await request(app)
+            .get(`/jobs?hasEquity=true`);
+        expect(res.body).toEqual({
+            jobs: [{
+                id: expect.any(Number),
+                title: "J1",
+                salary: 2,
+                equity: "0.2",
+                companyHandle: "c1",
+            }],
+        });
+    });
+
+    test("not found for no such job", async function() {
+        const res = await request(app)
+            .get(`/jobs?name=nope`)
+        expect(res.statusCode).toEqual(404);
+    });
+
 })

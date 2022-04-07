@@ -11,7 +11,8 @@ const {
     commonAfterEach,
     commonAfterAll,
     u1Token,
-    u2Token
+    u2Token,
+    adminToken,
 } = require("./_testCommon");
 const { async } = require("../models/company");
 
