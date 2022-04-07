@@ -4,11 +4,12 @@
 
 const jsonschema = require("jsonschema");
 const express = require("express");
-const { BadExpressError } = require("../expressError");
+const { BadExpressError, BadRequestError } = require("../expressError");
 const Job = require("../models/job");
 const { createToken } = require("../helpers/tokens");
 const jobNewSchema = require("../schemas/jobNew.json");
 const jobUpdateSchema = require("../schemas/jobUpdate.json");
+const jobSearchSchema = require("../schemas/jobSearch.json");
 const { ensureAdmin } = require("../middleware/auth");
 const { async } = require("../models/company");
 
@@ -36,3 +37,37 @@ router.post("/", ensureAdmin, async function() {
         return next(err);
     }
 });
+
+
+/** GET / { jobs: [{id, title, salary, equity, companyHandle }, ...]}
+ * 
+ * Can search filter in query:
+ * 
+ * title - filter by job title (case-insensitive, partial matches)
+ * minSalary - filter to jobs w/t @ least that salary
+ * hasEquity - if true, filter to jobs that have non-zero equity. If false or not included in the filtering,
+ * list all jobs.
+ * 
+ * Authorization req: none
+ * 
+ * refs jobSearchSchema
+ */
+
+router.get("/", async function(req, res, next) {
+    try {
+        const q = req.query;
+        if (q.minSalary !== undefined) q.minSalary = +q.minSalary;
+        q.hasEquity === q.hasEquity === "true";
+        const validator = jsonschema.validate(q.jobSearchSchema);
+        if (!validator.valid) {
+            const errs = validator.errors.map(e => e.stack);
+            throw new BadRequestError(errs);
+        }
+        const jobs = await Job.findAll(q);
+        return res.json({ jobs });
+    } catch (err) {
+        return next(err);
+    }
+});
+
+module.exports = router;
