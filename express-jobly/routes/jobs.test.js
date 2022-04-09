@@ -2,9 +2,9 @@
 
 const request = require("supertest");
 
-const db = require("../db");
+// const db = require("../db");
 const app = require("../app");
-const Job = require("../models/jobs");
+// const Job = require("../models/jobs");
 
 const {
     commonBeforeAll,
@@ -15,7 +15,7 @@ const {
     u2Token,
     adminToken,
 } = require("./_testCommon");
-const { async } = require("../models/jobs.js");
+const { async } = require("../models/job");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -145,5 +145,4 @@ describe("GET /jobs", function() {
             .get(`/jobs?name=nope`)
         expect(res.statusCode).toEqual(404);
     });
-
-})
+});

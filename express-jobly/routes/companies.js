@@ -12,7 +12,7 @@ const Company = require("../models/company");
 const companyNewSchema = require("../schemas/companyNew.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");
 const companyFilterSchema = require("../schemas/companyFilter.json");
-const db = require("../db");
+
 
 const router = new express.Router();
 
@@ -23,10 +23,10 @@ const router = new express.Router();
  *
  * Returns { handle, name, description, numEmployees, logoUrl }
  *
- * Authorization required: login
+ * Authorization required: admin
  */
 
-router.post("/", ensureLoggedIn, async function(req, res, next) {
+router.post("/", ensureAdmin, async function(req, res, next) {
     try {
         const validator = jsonschema.validate(req.body, companyNewSchema);
         if (!validator.valid) {
@@ -59,9 +59,6 @@ router.get("/", async function(req, res, next) {
     try {
         const filter = req.query;
         if (filter.minEmployees !== undefined) filter.minEmployees = +filter.minEmployees;
-        // if (filter.maxEmployees) {
-        //     filter.maxEmployees = (+filter.maxEmployees);
-        // };
         if (filter.maxEmployees !== undefined) filter.maxEmployees = +filter.maxEmployees;
         const validator = jsonschema.validate(filter, companyFilterSchema);
         // pass validation errors to error-handler
@@ -116,11 +113,11 @@ router.get("/:handle", async function(req, res, next) {
  *
  * Returns { handle, name, description, numEmployees, logo_url }
  *
- * Authorization required: login
+ * Authorization required: admin
  * /companies/anderson-arias-morrow
  */
 
-router.patch("/:handle", ensureLoggedIn, ensureAdmin, async function(req, res, next) {
+router.patch("/:handle", ensureAdmin, async function(req, res, next) {
     try {
         const validator = jsonschema.validate(req.body, companyUpdateSchema);
         if (!validator.valid) {
@@ -140,7 +137,7 @@ router.patch("/:handle", ensureLoggedIn, ensureAdmin, async function(req, res, n
  * Authorization: login
  */
 
-router.delete("/:handle", ensureLoggedIn, ensureAdmin, async function(req, res, next) {
+router.delete("/:handle", ensureAdmin, async function(req, res, next) {
     try {
         await Company.remove(req.params.handle);
         return res.json({ deleted: req.params.handle });

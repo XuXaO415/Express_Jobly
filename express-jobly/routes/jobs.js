@@ -57,7 +57,7 @@ router.get("/", async function(req, res, next) {
     try {
         const q = req.query;
         if (q.minSalary !== undefined) q.minSalary = +q.minSalary;
-        q.hasEquity === q.hasEquity === "true";
+        q.hasEquity = q.hasEquity === "true";
         const validator = jsonschema.validate(q.jobSearchSchema);
         if (!validator.valid) {
             const errs = validator.errors.map(e => e.stack);
@@ -65,6 +65,23 @@ router.get("/", async function(req, res, next) {
         }
         const jobs = await Job.findAll(q);
         return res.json({ jobs });
+    } catch (err) {
+        return next(err);
+    }
+});
+
+/** GET /[handle]  =>  { company }
+ *
+ *  Company is { handle, name, description, numEmployees, logoUrl, jobs }
+ *   where jobs is [{ id, title, salary, equity }, ...]
+ *
+ * Authorization required: none
+ */
+
+router.get("/:id", async function(req, res, next) {
+    try {
+        const job = await Job.get(req.params.id);
+        return res.json({ job });
     } catch (err) {
         return next(err);
     }
