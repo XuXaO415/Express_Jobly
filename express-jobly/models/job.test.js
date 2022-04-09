@@ -36,7 +36,7 @@ describe("create", function() {
                     //from solutions
                     id: expect.any(Number),
                     title: "J1",
-                    salary: 1,
+                    salary: 1000,
                     equity: "3.14",
                     companyHandle: "c1",
                     companyHandle: "C1",
@@ -44,7 +44,7 @@ describe("create", function() {
                 {
                     id: expect.any(Number),
                     title: "J2",
-                    salary: 2,
+                    salary: 2000,
                     equity: "0.2",
                     companyHandle: "c1",
                     companyName: "C1",
@@ -52,7 +52,7 @@ describe("create", function() {
                 {
                     id: expect.any(Number),
                     title: "J3",
-                    salary: 3,
+                    salary: 3000,
                     equity: null,
                     companyHandle: "c1",
                     companyName: "C1",
@@ -67,7 +67,47 @@ describe("create", function() {
 describe("findAll", function() {
     test("works: no filter", async function() {
         let jobs = await Job.findAll();
-        expect(jobs).toEqual([{}])
+        expect(jobs).toEqual([{
+                id: testJobIds[0],
+                title: "J1",
+                salary: 1000,
+                equity: "0.1",
+                companyHandle: "c1",
+                companyName: "C2",
+            },
+            {
+                id: testJobIds[1],
+                title: "J2",
+                salary: 2000,
+                equity: "0.2",
+                companyHandle: "c2",
+                companyName: "C2",
+            },
+            {
+                id: testJobIds[3],
+                title: "J3",
+                salary: 3000,
+                equity: "0.3",
+                companyHandle: "c3",
+                companyName: "C3",
+            },
+            {
+                id: testJobIds[4],
+                title: "J4",
+                salary: 4000,
+                equity: "0.4",
+                companyHandle: "c4",
+                companyName: "C4",
+            },
+            {
+                id: testJobIds[5],
+                title: "J5",
+                salary: NULL,
+                equity: NULL,
+                companyHandle: "c5",
+                companyName: "C5",
+            },
+        ]);
     });
 });
 

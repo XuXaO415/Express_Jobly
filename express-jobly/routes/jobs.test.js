@@ -2,7 +2,7 @@
 
 const request = require("supertest");
 
-// const db = require("../db");
+const db = require("../db");
 const app = require("../app");
 // const Job = require("../models/jobs");
 
@@ -22,7 +22,10 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
-/************************************** POST /jobs */
+/************************************** POST /jobs
+ * 
+ * Modeled after routes/company.test.js
+ */
 
 describe("POST /jobs", function() {
     const newJob = {
@@ -146,3 +149,9 @@ describe("GET /jobs", function() {
         expect(res.statusCode).toEqual(404);
     });
 });
+
+/************************************** GET /jobs/:id */
+
+/************************************** PATCH /jobs/:id */
+
+/************************************** DELETE /jobs/:id */
