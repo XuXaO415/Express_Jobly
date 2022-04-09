@@ -24,10 +24,8 @@ const router = express.Router();
  * This returns the newly created user and an authentication token for them:
  *  {user: { username, firstName, lastName, email, isAdmin }, token }
  *
- * Authorization required: login
- * 
- * So after carefully looking at the directions again, 
- * I realized that the questions is asking only admins can add a new user; GOT IT!
+ * Authorization required: login, admin
+ *  
  **/
 
 router.post("/", ensureAdmin, ensureLoggedIn, async function(req, res, next) {
@@ -70,7 +68,7 @@ router.get("/", ensureAdmin, ensureLoggedIn, async function(req, res, next) {
  * Returns { username, firstName, lastName, isAdmin }
  *
  * Authorization required: login, admin
- * users?username=xxx
+ * ex: users?username=xxx
  **/
 
 router.get("/:username", ensureUserOrAdminCredentials, ensureLoggedIn, async function(req, res, next) {
@@ -90,7 +88,7 @@ router.get("/:username", ensureUserOrAdminCredentials, ensureLoggedIn, async fun
  *
  * Returns { username, firstName, lastName, email, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: login or admin
  **/
 
 router.patch("/:username", ensureLoggedIn, ensureUserOrAdminCredentials, async function(req, res, next) {
@@ -111,10 +109,10 @@ router.patch("/:username", ensureLoggedIn, ensureUserOrAdminCredentials, async f
 
 /** DELETE /[username]  =>  { deleted: username }
  *
- * Authorization required: login, admin
+ * Authorization required: admin
  **/
 
-router.delete("/:username", ensureLoggedIn, async function(req, res, next) {
+router.delete("/:username", ensureUserOrAdminCredentials, async function(req, res, next) {
     try {
         await User.remove(req.params.username);
         return res.json({ deleted: req.params.username });

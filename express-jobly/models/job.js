@@ -3,6 +3,7 @@
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
 const { sqlForPartialUpdate, sqlCompanyFilter } = require("../helpers/sql");
+const { remove } = require("./company");
 
 /** Related fxns for companies */
 
@@ -20,7 +21,7 @@ class Job {
     static async create(data) {
             const result = await db.query(
                 `INSERT INTO jobs
-                (title, salary, equity, companyHandle)
+                (title, salary, equity, company_handle)
                 VALUES($1, $2, $3, $4)
                 RETURNING id, title, salary, equity, company_handle AS "companyHandle"`, [data.title, data.salary, data.equity, data.companyHandle]
             );
@@ -53,7 +54,7 @@ class Job {
         if (title !== undefined) {
             // push title to end of arr
             queryValues.push(`%${title}%`);
-            //returns new length
+            //returns new query results
             queryExpression.push(`title ILIKE ${queryValues.length}`);
         }
         if (minSalary !== undefined) {
@@ -97,7 +98,8 @@ class Job {
             num_employees AS "numEmployees,
             logo_url AS "logoUrl"
             FROM companies 
-            WHERE handle = $1`, [job.companyHandle]);
+            WHERE handle = $1`, [job.companyHandle]
+        );
 
         // This section is gathered from the solutions page
         delete job.companyHandle;
@@ -106,16 +108,16 @@ class Job {
     }
 
     /** Updates job data with`data`.
-          
-              This is a "partial update" --- acceptable if data doesn't contain all the fields;
-              this only changes provides ones.
-          
-              Data can include: {title, salary, equity } 
-              Returns {id, title, salary, equity, companyHandle }
-          
-              Throws NotFoundError if not found. 
-          
-              */
+            
+                This is a "partial update" --- acceptable if data doesn't contain all the fields;
+                this only changes provides ones.
+            
+                Data can include: {title, salary, equity } 
+                Returns {id, title, salary, equity, companyHandle }
+            
+                Throws NotFoundError if not found. 
+            
+                */
 
     static async update(data, id) {
         const { setCols, values } = sqlForPartialUpdate(data, {});
@@ -128,6 +130,23 @@ class Job {
         const job = result.rows[0];
         if (!job) throw new NotFoundError(`Job: ${id} cannot be found`);
         return job;
+    }
+
+    /** Delete given job from db; returns undefined
+     *
+     * Throws NotFoundError if job not found
+     */
+
+    static async remove(id) {
+        const result = await db.query(
+            `DELETE
+            FROM jobs 
+            WHERE id = $1
+            RETURNING id`, [id]);
+
+        const job = result.rows[0];
+
+        if (!job) throw new NotFoundError(`Job with ${id} not found`);
     }
 }
 
