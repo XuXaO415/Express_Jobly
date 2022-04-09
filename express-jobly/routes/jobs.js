@@ -58,7 +58,7 @@ router.get("/", async function(req, res, next) {
         const q = req.query;
         if (q.minSalary !== undefined) q.minSalary = +q.minSalary;
         q.hasEquity = q.hasEquity === "true";
-        const validator = jsonschema.validate(q.jobSearchSchema);
+        const validator = jsonschema.validate(q, jobSearchSchema);
         if (!validator.valid) {
             const errs = validator.errors.map(e => e.stack);
             throw new BadRequestError(errs);
@@ -70,10 +70,10 @@ router.get("/", async function(req, res, next) {
     }
 });
 
-/** GET /[handle]  =>  { company }
+/** GET /[jobId] => { job }
  *
- *  Company is { handle, name, description, numEmployees, logoUrl, jobs }
- *   where jobs is [{ id, title, salary, equity }, ...]
+ * Returns { id, title, salary, equity, company }
+ *   where company is { handle, name, description, numEmployees, logoUrl }
  *
  * Authorization required: none
  */
@@ -86,5 +86,23 @@ router.get("/:id", async function(req, res, next) {
         return next(err);
     }
 });
+/** Cross reference and pattern match routes/companies /:handle line 120
+ * 
+ *  Update in job.update
+ */
+router.patch("/:id", async function(req, res, next) {
+    try {
+        const validator = jsonschema.validate(req.body, jobUpdateSchema);
+        if (!validator.valid) {
+            const errs = validator.errors.map(e => e.stack);
+            throw new BadRequestError(errs);
+        }
+        const job = await Job.update(req.params.id, req.body);
+        return res.json({ job });
+    } catch (err) {
+        return next(err);
+    }
+});
 
+/** Pattern match  delete /:id */
 module.exports = router;
