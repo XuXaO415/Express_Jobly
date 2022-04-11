@@ -44,16 +44,18 @@ class Job {
                 j.title,
                 j.salary,
                 j.equity,
-                j.company_handle AS "companyHandle"
-                c.name AS companyName,
+                j.company_handle AS "companyHandle",
+                c.name AS companyName
                 FROM jobs AS j
                 LEFT JOIN companies AS c ON c.handle = j.company_handle`;
-        let { queryExpression, queryValues } = [];
+        // let { queryExpression, queryValues } = [];
+        let queryExpression = [];
+        let queryValues = [];
         // const { title, minSalary, hasEquity } = searchFilter;
         //checks if title is not equal to undefined
         if (title !== undefined) {
             // push title to end of arr
-            queryValues.push(`%${title}%`);
+            queryValues.push(`${title}%`);
             //returns new query results
             queryExpression.push(`title ILIKE ${queryValues.length}`);
         }
@@ -73,7 +75,8 @@ class Job {
         }
         //Finalize query & returns query results in order by title
 
-        query += " ODER BY title";
+        query += " ORDER BY title";
+        console.log(query);
         const jobsRes = await db.query(query, queryValues);
         return jobsRes.rows;
     }

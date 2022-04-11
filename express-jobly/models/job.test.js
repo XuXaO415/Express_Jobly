@@ -23,12 +23,7 @@ afterAll(commonAfterAll);
  * Modeled after models/company.test.js
  */
 describe("create", function() {
-    const newJob = {
-        companyHandle: "",
-        title: "",
-        salary: 100,
-        equity: "",
-    };
+
     test("works", async function() {
         let job = await Job.create(newJob);
         expect(job).toEqual({
@@ -39,7 +34,7 @@ describe("create", function() {
                     salary: 1000,
                     equity: "3.14",
                     companyHandle: "c1",
-                    companyHandle: "C1",
+                    companyName: "C1",
                 },
                 {
                     id: expect.any(Number),
@@ -118,7 +113,7 @@ describe("GET", function() {
         const job = await Job.get(testJobIds[0]);
         expect(job).toEqual({
             id: testJobIds[0],
-            title: "Job1",
+            title: "J1",
             salary: 100,
             equity: "0.1",
             company: {
