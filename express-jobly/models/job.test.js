@@ -136,6 +136,22 @@ describe("GET", function() {
 });
 
 /************************************** update */
+describe("update", function() {
+    const updateData = {
+        title: "New",
+        salary: 1000,
+        equity: "0.5",
+    };
+
+    test("works", async function() {
+        let job = awaitJob.update(testJobIds[0], updateData);
+        expect(job).toEqual({
+            id: testJobIds[0],
+            companyHandle: "c1",
+            ...updateData,
+        });
+    });
+})
 
 /************************************** remove */
 

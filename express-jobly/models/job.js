@@ -46,7 +46,7 @@ class Job {
                 j.equity,
                 j.company_handle AS "companyHandle",
                 c.name AS companyName
-                FROM jobs AS j
+                FROM jobs j
                 LEFT JOIN companies AS c ON c.handle = j.company_handle`;
         // let { queryExpression, queryValues } = [];
         let queryExpression = [];
@@ -55,7 +55,7 @@ class Job {
         //checks if title is not equal to undefined
         if (title !== undefined) {
             // push title to end of arr
-            queryValues.push(`${title}%`);
+            queryValues.push(`%${title}%`);
             //returns new query results
             queryExpression.push(`title ILIKE ${queryValues.length}`);
         }
@@ -76,7 +76,7 @@ class Job {
         //Finalize query & returns query results in order by title
 
         query += " ORDER BY title";
-        console.log(query);
+        // console.log(query);
         const jobsRes = await db.query(query, queryValues);
         return jobsRes.rows;
     }
@@ -88,17 +88,17 @@ class Job {
             title, 
             salary,
             equity,
-            company_handle AS companyHandle
+            company_handle AS "companyHandle"
             FROM jobs
             WHERE id = $1`, [id]
         );
         const job = jobRes.row[0];
-        if (!job) throw new NotFoundError(`Job ${id} not found`);
+        if (!job) throw new NotFoundError(`Job with id: ${id} not found`);
         const companyRes = await db.query(
             `SELECT handle,
             name,
             description,
-            num_employees AS "numEmployees,
+            num_employees AS "numEmployees",
             logo_url AS "logoUrl"
             FROM companies 
             WHERE handle = $1`, [job.companyHandle]
@@ -131,7 +131,7 @@ class Job {
             RETURNING id, title, salary, equity, company_handle AS "companyHandle"`;
         const result = await await db.query(querySql, [...values, id]);
         const job = result.rows[0];
-        if (!job) throw new NotFoundError(`Job: ${id} cannot be found`);
+        if (!job) throw new NotFoundError(`Job: ${id} not found`);
         return job;
     }
 
