@@ -197,6 +197,40 @@ class User {
 
         if (!user) throw new NotFoundError(`No user: ${username}`);
     }
+
+    static async applyForJob(username, jobId) {
+        const crossUserCheck = await db.query(
+            `SELECT username
+            FROM users
+            WHERE username = $1`, [username]
+        );
+        if (crossUserCheck.rows[0]) {
+            throw new NotFoundError(`Username: ${username} not found`);
+        }
+        const crossJobIdCheck = await db.query(
+            `SELECT id
+            FROM jobs
+            WHERE id = $1`, [jobId]
+        );
+        if (crossJobIdCheck.rows[0]) {
+            throw new NotFoundError(`Job: ${jobId} not found`);
+        }
+        const crossCheck = await db.query(
+            `SELECT username
+            FROM applications
+            WHERE job_id = $1 AND username = $2`, [jobId, username]
+        );
+        if (crossCheck.rows[0]) {
+            throw new BadRequestError(`Error, ${username} already applied to job: ${jobId} already `);
+        }
+        const result = await db.query(
+            `INSERT INTO applications
+            (username, job_id)
+            VALUES ($1, $2)
+            RETURNING job_id AS "jobId"`, [username, jobId]
+        );
+        return user = result.rows[0];
+    }
 }
 
 

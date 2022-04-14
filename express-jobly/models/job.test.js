@@ -11,7 +11,7 @@ const {
     commonAfterAll,
     testJobIds,
 } = require("./_testCommon");
-const { request } = require("../app");
+// const { request } = require("../app");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -97,8 +97,8 @@ describe("findAll", function() {
             {
                 id: testJobIds[5],
                 title: "J5",
-                salary: NULL,
-                equity: NULL,
+                salary: null,
+                equity: null,
                 companyHandle: "c5",
                 companyName: "C5",
             },

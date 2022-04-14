@@ -47,7 +47,8 @@ router.post("/", ensureAdmin, async function(req, res, next) {
  * Can filter on provided search filters:
  * - minEmployees
  * - maxEmployees
- * - nameLike (will find case-insensitive, partial matches) --regex matchers
+ * companies?maxEmployees=12
+ * - name (will find case-insensitive, partial matches) --regex matchers
  *
  * Authorization required: none
  * 
@@ -56,16 +57,16 @@ router.post("/", ensureAdmin, async function(req, res, next) {
 
 
 router.get("/", async function(req, res, next) {
+
+    const filter = req.query;
+    if (filter.minEmployees !== undefined) filter.minEmployees = +filter.minEmployees;
+    if (filter.maxEmployees !== undefined) filter.maxEmployees = +filter.maxEmployees;
     try {
-        const filter = req.query;
-        if (filter.minEmployees !== undefined) filter.minEmployees = +filter.minEmployees;
-        if (filter.maxEmployees !== undefined) filter.maxEmployees = +filter.maxEmployees;
         const validator = jsonschema.validate(filter, companyFilterSchema);
         // pass validation errors to error-handler
         if (!validator.valid) {
             const errs = validator.errors.map(e => e.stack);
             throw new BadRequestError(errs);
-
         }
         const companies = await Company.findAll(filter);
         return res.json({ companies });
@@ -99,6 +100,7 @@ router.get("/", async function(req, res, next) {
 router.get("/:handle", async function(req, res, next) {
     try {
         const company = await Company.get(req.params.handle);
+        // console.log(company);
         return res.json({ company });
     } catch (err) {
         return next(err);
