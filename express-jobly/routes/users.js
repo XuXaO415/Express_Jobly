@@ -71,7 +71,7 @@ router.get("/", ensureAdmin, ensureLoggedIn, async function(req, res, next) {
  * ex: users?username=xxx
  **/
 
-router.get("/:username", ensureUserOrAdminCredentials, ensureLoggedIn, async function(req, res, next) {
+router.get("/:username", ensureUserOrAdminCredentials, ensureAdmin, async function(req, res, next) {
     try {
         const user = await User.get(req.params.username);
         return res.json({ user });
@@ -116,6 +116,28 @@ router.delete("/:username", ensureUserOrAdminCredentials, async function(req, re
     try {
         await User.remove(req.params.username);
         return res.json({ deleted: req.params.username });
+    } catch (err) {
+        return next(err);
+    }
+});
+
+/** POST /[username]/jobs/[id]  { state } => { application }
+ *
+ * Returns {"applied": jobId}
+ *
+ * Authorization required: admin or same-user-as-:username
+ * 
+ * ensureUserOrAdminCredentials
+ * 
+ * i.e /users/xxx/jobs/200
+ * */
+
+
+router.post("/:username/jobs/:id", ensureLoggedIn, async function(req, res, next) {
+    try {
+        const jobId = +req.params.id;
+        await User.applyForJob(req.params.username, jobId);
+        return res.json({ applied: jobId });
     } catch (err) {
         return next(err);
     }

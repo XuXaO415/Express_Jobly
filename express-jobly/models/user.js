@@ -199,37 +199,57 @@ class User {
     }
 
     static async applyForJob(username, jobId) {
-        const crossUserCheck = await db.query(
-            `SELECT username
-            FROM users
-            WHERE username = $1`, [username]
-        );
-        if (crossUserCheck.rows[0]) {
-            throw new NotFoundError(`Username: ${username} not found`);
-        }
-        const crossJobIdCheck = await db.query(
+        // const crossUserCheck = await db.query(
+        //     `SELECT username
+        //     FROM users
+        //     WHERE username = $1`, [username]
+        // );
+        // if (crossUserCheck.rows[0]) {
+        //     throw new NotFoundError(`Username: ${username} not found`);
+        // }
+        // const crossJobIdCheck = await db.query(
+        //     `SELECT id
+        //     FROM jobs
+        //     WHERE id = $1`, [jobId]
+        // );
+        // if (crossJobIdCheck.rows[0]) {
+        //     throw new NotFoundError(`Job: ${jobId} not found`);
+        // }
+        // const crossCheck = await db.query(
+        //     `SELECT username
+        //     FROM users
+        //     WHERE username = $1`, [username]
+        // );
+        // if (crossCheck.rows[0]) {
+        //     throw new BadRequestError(`Error, ${username} already applied to job: ${jobId}`);
+        // }
+        // await db.query(
+        //     `INSERT INTO applications
+        //     (username, job_id)
+        //     VALUES ($1, $2)`, [username, jobId]
+        // );
+        const preCheck = await db.query(
             `SELECT id
-            FROM jobs
-            WHERE id = $1`, [jobId]
+           FROM jobs
+           WHERE id = $1`, [jobId]
         );
-        if (crossJobIdCheck.rows[0]) {
-            throw new NotFoundError(`Job: ${jobId} not found`);
-        }
-        const crossCheck = await db.query(
+        const job = preCheck.rows[0];
+
+        if (!job) throw new NotFoundError(`No job: ${jobId}`);
+
+        const preCheck2 = await db.query(
             `SELECT username
-            FROM applications
-            WHERE job_id = $1 AND username = $2`, [jobId, username]
+           FROM users
+           WHERE username = $1`, [username]
         );
-        if (crossCheck.rows[0]) {
-            throw new BadRequestError(`Error, ${username} already applied to job: ${jobId} already `);
-        }
-        const result = await db.query(
-            `INSERT INTO applications
-            (username, job_id)
-            VALUES ($1, $2)
-            RETURNING job_id AS "jobId"`, [username, jobId]
+        const user = preCheck2.rows[0];
+
+        if (!user) throw new NotFoundError(`No username: ${username}`);
+
+        await db.query(
+            `INSERT INTO applications (job_id, username)
+           VALUES ($1, $2)`, [jobId, username]
         );
-        return user = result.rows[0];
     }
 }
 
