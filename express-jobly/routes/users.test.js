@@ -401,6 +401,23 @@ describe("DELETE /users/:username", function() {
 
 /************************************** POST /users/:username/jobs/:id */
 
-// describe("POST /users/:username/jobs/:id", function() {
-//     test("works for users")
-// })
+describe("POST /users/:username/jobs/:id", function() {
+    test("works for admin", async function() {
+        const res = await request(app)
+            .post(`/users/u1/jobs/${testJobIds[1]}`)
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(res.body).toEqual({ applied: testJobIds[1] });
+    });
+    test("unauth for anon", async function() {
+        const res = await request(app)
+            .post(`/users/u1/jobs/${testJobIds[1]}`)
+            // .set("authorization", `Bearer ${u1Token}`);
+        expect(res.statusCode).toEqual(401);
+    });
+    test("bad request w/t invalid job id", async function() {
+        const res = await request(app)
+            .post(`/users/u1/jobs/dopeNewJob`)
+            .set("authorization", `Bearer ${u1Token}`);
+        expect(res.statusCode).toEqual(400);
+    });
+});
