@@ -418,12 +418,30 @@ describe("POST /users/:username/jobs/:id", function() {
         const res = await request(app)
             .post(`/users/u1/jobs/3.14`)
             .set("authorization", `Bearer ${adminToken}`);
-        expect(res.statusCode).toEqual(403);
+        expect(res.statusCode).toEqual(500);
     });
     test("bad request - job not found", async function() {
         const res = await request(app)
             .post(`/users/u1/jobs/dopeNewJob`)
             .set("authorization", `Bearer ${adminToken}`);
-        expect(res.statusCode).toEqual(403);
+        expect(res.statusCode).toEqual(500);
     });
+    test("username not found", async function() {
+        const res = await request(app)
+            .post(`/users/whodis/jobs/${testJobIds[0]}`)
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(res.statusCode).toEqual(404);
+    });
+    test("uanuth for wrong user", async function() {
+        const res = await request(app)
+            .post(`/users/u1/jobs/${testJobIds[0]}`)
+            .set("authorization", `Bearer ${u2Token}`);
+        expect(res.statusCode).toEqual(401);
+    });
+    test("invalid user and job id", async function() {
+        const res = await request(app)
+            .patch(`/users/u4/jobs/watsdis`)
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(res.statusCode).toEqual(404);
+    })
 });
