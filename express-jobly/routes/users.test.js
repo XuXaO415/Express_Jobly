@@ -416,8 +416,14 @@ describe("POST /users/:username/jobs/:id", function() {
     });
     test("bad request w/t invalid job id", async function() {
         const res = await request(app)
+            .post(`/users/u1/jobs/3.14`)
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(res.statusCode).toEqual(403);
+    });
+    test("bad request - job not found", async function() {
+        const res = await request(app)
             .post(`/users/u1/jobs/dopeNewJob`)
-            .set("authorization", `Bearer ${u1Token}`);
-        expect(res.statusCode).toEqual(400);
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(res.statusCode).toEqual(403);
     });
 });
