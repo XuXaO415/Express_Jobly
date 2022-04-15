@@ -133,7 +133,7 @@ router.delete("/:username", ensureUserOrAdminCredentials, async function(req, re
  * */
 
 
-router.post("/:username/jobs/:id", ensureLoggedIn, async function(req, res, next) {
+router.post("/:username/jobs/:id", ensureUserOrAdminCredentials, async function(req, res, next) {
     try {
         const jobId = +req.params.id;
         await User.applyForJob(req.params.username, jobId);
