@@ -24,7 +24,7 @@ const router = express.Router();
  * authorization required: Admin
  */
 
-router.post("/", ensureAdmin, async function() {
+router.post("/", ensureAdmin, async function(req, res, next) {
     try {
         const validator = jsonschema.validate(req.body, jobNewSchema);
         if (!validator.valid) {
@@ -39,7 +39,7 @@ router.post("/", ensureAdmin, async function() {
 });
 
 
-/** GET / { jobs: [{id, title, salary, equity, companyHandle }, ...]}
+/** GET / { jobs: [{id, title, salary, equity, companyHandle, companyName }, ...]}
  * 
  * Can search filter in query:
  * 
