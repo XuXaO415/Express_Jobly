@@ -14,8 +14,10 @@ const {
     u1Token,
     u2Token,
     adminToken,
+    testJobIds,
 } = require("./_testCommon");
 const { async } = require("../models/job");
+const { set } = require("../app");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -25,47 +27,120 @@ afterAll(commonAfterAll);
 /************************************** POST /jobs
  * 
  * Modeled after routes/company.test.js
+ * -- Re-wrote tests for this section
  */
 
+
 describe("POST /jobs", function() {
-    const newJob = {
-        title: "s1",
-        salary: 100000,
-        equity: 0,
-        companyHandle: "s1"
-    };
-    test("ok for users", async function() {
-        const res = await request(app)
+    test("ok for admin", async function() {
+        const resp = await request(app)
             .post(`/jobs`)
-            .send(newJob)
-            .set("authorization", `Bearer ${u1Token}`);
-        expect(res.statusCode).toEqual(201);
-        expect(res.body).toEqual({
-            job: newJob,
+            .send({
+                companyHandle: "c1",
+                title: "New-job-post",
+                salary: 10,
+                equity: "0.2",
+            })
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(resp.statusCode).toEqual(201);
+        expect(resp.body).toEqual({
+            job: {
+                id: expect.any(Number),
+                title: "New-job-post",
+                salary: 10,
+                equity: "0.2",
+                companyHandle: "c1",
+            },
         });
     });
-    test("bad request w/t missing data", async function() {
-        const res = await request(app)
-            .post(`/jobs`)
+
+    // Why does this test fail?
+    // describe("POST /jobs", function() {
+    //     test("works for admin", async function() {
+    //         const res = await request(app)
+    //             .post(`/jobs`)
+    //             .send({
+    //                 title: "New Job Post",
+    //                 salary: 1000,
+    //                 equity: "0.2",
+    //                 companyHandle: "c1",
+    //             })
+    //             .set("authorization", `Bearer ${adminToken}`);
+    //         expect(res.statusCode).toEqual(201);
+    //         expect(res.body).toEqual({
+    //             job: {
+    //                 id: expect.any(Number),
+    //                 title: "s1",
+    //                 salary: 1000,
+    //                 equity: "0.2",
+    //                 companyHandle: "c2",
+    //             },
+    //         });
+    //     });
+
+    test("unauth for anon", async function() {
+        const res = await request(app).post(`/jobs`)
             .send({
-                salary: 100000,
-                equity: 0,
+                title: "s1",
+                salary: 1000,
+                equity: "0.2",
+                companyHandle: "c2",
             })
-            .set("authorization", `Bearer ${u1Token}`);
-        expect(res.statusCode).toEqual(400);
-    });
-    test("bad request with invalid data", async function() {
-        const res = await request(app)
-            .post(`/jobs`)
-            .send({
-                ...newJob,
-                salary: "Big $$$",
-                equity: "3.14159265359",
-            })
-            .set("authorization", `Bearer${u2Token}`);
-        expect(res.statusCode).toEqual(400);
+            .set("authorization", `Bearer ${u2Token}`);
+        expect(res.statusCode).toEqual(401);
     });
 });
+
+// describe("POST /jobs", function() {
+//     const newJob = {
+//         title: "s1",
+//         salary: 100000,
+//         equity: 0,
+//         companyHandle: "s1"
+//     };
+
+//     test("ok for admin", async function() {
+//         const res = await request(app)
+//             .post(`/jobs`)
+//             .send(newJob)
+//             .set("authorization", `Bearer ${adminToken}`)
+//         expect(res.statusCode).toEqual(201);
+//         expect(res.body).toEqual({
+//             job: newJob,
+//         });
+//     })
+//     test("ok for users", async function() {
+//         const res = await request(app)
+//             .post(`/jobs`)
+//             .send(newJob)
+//             .set("authorization", `Bearer ${u1Token}`);
+//         expect(res.statusCode).toEqual(401);
+//         expect(res.body).toEqual({
+//             job: newJob,
+//         });
+//     });
+//     test("bad request w/t missing data", async function() {
+//         const res = await request(app)
+//             .post(`/jobs`)
+//             .send({
+//                 salary: 100000,
+//                 equity: 0,
+//             })
+//             .set("authorization", `Bearer ${adminToken}`);
+//         expect(res.statusCode).toEqual(400);
+//     });
+//     test("bad request with invalid data", async function() {
+//         const res = await request(app)
+//             .post(`/jobs`)
+//             .send({
+//                 ...newJob,
+//                 salary: "Big $$$",
+//                 equity: "3.14159265359",
+//             })
+//             .set("authorization", `Bearer${adminToken}`);
+//         expect(res.statusCode).toEqual(400);
+//     });
+// });
 /************************************** GET /jobs */
 describe("GET /jobs", function() {
     test("works for anon", async function() {
@@ -78,7 +153,7 @@ describe("GET /jobs", function() {
                     salary: 1,
                     equity: "3.14",
                     companyHandle: "c1",
-                    companyHandle: "C1",
+                    companyName: "C1",
                 },
                 {
                     id: expect.any(Number),
@@ -154,4 +229,5 @@ describe("GET /jobs", function() {
 
 /************************************** PATCH /jobs/:id */
 
+/************************************** DELETE /jobs/:id */
 /************************************** DELETE /jobs/:id */
