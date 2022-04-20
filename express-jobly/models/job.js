@@ -57,7 +57,7 @@ class Job {
             // push title to end of arr
             queryValues.push(`%${title}%`);
             //returns new query results
-            queryExpression.push(`title ILIKE ${queryValues.length}`);
+            queryExpression.push(`title ILIKE $${queryValues.length}`);
         }
         if (minSalary !== undefined) {
             queryValues.push(minSalary);
@@ -92,7 +92,7 @@ class Job {
             FROM jobs
             WHERE id = $1`, [id]
         );
-        const job = jobRes.row[0];
+        const job = jobRes.rows[0];
         if (!job) throw new NotFoundError(`Job with id: ${id} not found`);
         const companyRes = await db.query(
             `SELECT handle,
