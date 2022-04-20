@@ -95,6 +95,8 @@ router.get("/", async function(req, res, next) {
  *   where jobs is [{ id, title, salary, equity }, ...]
  *
  * Authorization required: none
+ * 
+ * i.e /companies/anderson-arias-morrow
  */
 
 router.get("/:handle", async function(req, res, next) {
@@ -136,7 +138,7 @@ router.patch("/:handle", ensureAdmin, async function(req, res, next) {
 
 /** DELETE /[handle]  =>  { deleted: handle }
  *
- * Authorization: login
+ * Authorization: admin
  */
 
 router.delete("/:handle", ensureAdmin, async function(req, res, next) {

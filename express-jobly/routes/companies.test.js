@@ -105,7 +105,7 @@ describe("GET /companies", function() {
             ],
         });
     });
-    // Test is failing, returns object and not an array. FIX THIS => in findAll
+
     test("test filtering capabilities", async function() {
         const resp = await request(app)
             .get("/companies")

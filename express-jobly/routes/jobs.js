@@ -24,7 +24,7 @@ const router = express.Router();
  * authorization required: Admin
  */
 
-router.post("/", ensureAdmin, async function(req, res, next) {
+router.post("/", async function(req, res, next) {
     try {
         const validator = jsonschema.validate(req.body, jobNewSchema);
         if (!validator.valid) {
@@ -104,8 +104,13 @@ router.patch("/:id", async function(req, res, next) {
     }
 });
 
-/** Pattern match  delete /:id */
-router.delete("/:id", async function(req, res, next) {
+/** Pattern match  delete /:id
+ * 
+ * /jobs/200
+ * 
+ *  Authorization: admin
+ */
+router.delete("/:id", ensureAdmin, async function(req, res, next) {
     try {
         await Job.remove(req.params.id);
         return res.json({ deleted: req.params.id });

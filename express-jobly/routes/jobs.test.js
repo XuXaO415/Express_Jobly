@@ -151,7 +151,7 @@ describe("GET /jobs", function() {
                     id: expect.any(Number),
                     title: "J1",
                     salary: 1,
-                    equity: "3.14",
+                    equity: "0.1",
                     companyHandle: "c1",
                     companyName: "C1",
                 },
@@ -175,17 +175,25 @@ describe("GET /jobs", function() {
         });
     });
 
-    test("filter by title", async function() {
-        const res = await request(app).get(`/jobs?title=j1`);
+    test("works: filter by title", async function() {
+        // const res = await request(app).get(`/jobs?title=j1`);
+        const res = await request(app)
+            .get(`/jobs`)
+            .query({ title: "j1" });
         expect(res.body).toEqual({
             jobs: [{
                 id: expect.any(Number),
                 title: "J1",
                 salary: 1,
-                equity: "3.14",
+                equity: "0.1",
                 companyHandle: "c1",
                 companyName: "C1",
             }, ],
+        });
+        const res2 = await request(app)
+            .get(`/jobs?title=a`);
+        expect(res.statusCode).toEqual({
+            jobs: []
         });
     });
 
@@ -210,10 +218,17 @@ describe("GET /jobs", function() {
         expect(res.body).toEqual({
             jobs: [{
                 id: expect.any(Number),
-                title: "J1",
+                title: "J2",
                 salary: 2,
                 equity: "0.2",
                 companyHandle: "c1",
+            }, {
+                id: expect.any(Number),
+                title: "J1",
+                salary: 1,
+                equity: "0.1",
+                companyHandle: "c1",
+                companyName: "C1",
             }],
         });
     });
