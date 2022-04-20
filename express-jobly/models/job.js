@@ -45,8 +45,8 @@ class Job {
                 j.salary,
                 j.equity,
                 j.company_handle AS "companyHandle",
-                c.name AS companyName
-                FROM jobs j
+                c.name AS "companyName"
+                FROM jobs AS j
                 LEFT JOIN companies AS c ON c.handle = j.company_handle`;
         // let { queryExpression, queryValues } = [];
         let queryExpression = [];
