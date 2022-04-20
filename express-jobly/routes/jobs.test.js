@@ -242,6 +242,28 @@ describe("GET /jobs", function() {
 
 /************************************** GET /jobs/:id */
 
+describe("GET / jobs/:id", function() {
+    test("works for anon", async function() {
+        let results =
+            await db.query(`SELECT id FROM jobs WHERE title ="j1"`)
+        const res = await request(app)
+            .get(`/jobs/${results.rows[0].id}`);
+        expect(res.body).toEqual({
+            job: {
+                id: expect.any(Number),
+                title: "j1",
+                salary: 1,
+                equity: "0.1",
+                companyHandle: "c1"
+            }
+        });
+    });
+    test("not found for no such job", async function() {
+        const resp = await request(app).get(`/jobs/0`);
+        expect(resp.statusCode).toEqual(404);
+    });
+});
+
 /************************************** PATCH /jobs/:id */
 
 /************************************** DELETE /jobs/:id */
