@@ -92,12 +92,13 @@ router.get("/:id", async function(req, res, next) {
  */
 router.patch("/:id", async function(req, res, next) {
     try {
+        console.log(req.body);
         const validator = jsonschema.validate(req.body, jobUpdateSchema);
         if (!validator.valid) {
             const errs = validator.errors.map(e => e.stack);
             throw new BadRequestError(errs);
         }
-        const job = await Job.update(req.params.id, req.body);
+        const job = await Job.update(req.body, req.params.id);
         return res.json({ job });
     } catch (err) {
         return next(err);

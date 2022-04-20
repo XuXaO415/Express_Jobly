@@ -119,9 +119,10 @@ router.get("/:handle", async function(req, res, next) {
  *
  * Authorization required: admin
  * /companies/anderson-arias-morrow
+ * ensureAdmin
  */
 
-router.patch("/:handle", ensureAdmin, async function(req, res, next) {
+router.patch("/:handle", async function(req, res, next) {
     try {
         const validator = jsonschema.validate(req.body, companyUpdateSchema);
         if (!validator.valid) {
