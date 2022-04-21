@@ -21,10 +21,10 @@ const router = express.Router();
  * 
  * returns { id, title, salary, equity, companyHandle }
  * 
- * authorization required: Admin
+ * authorization required: admin
  */
 
-router.post("/", async function(req, res, next) {
+router.post("/", ensureAdmin, async function(req, res, next) {
     try {
         const validator = jsonschema.validate(req.body, jobNewSchema);
         if (!validator.valid) {
