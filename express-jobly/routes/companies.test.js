@@ -192,6 +192,12 @@ describe("GET /companies", function() {
         expect(res.statusCode).toEqual(400);
     });
 
+    test("bad request if invalid filter key", async function() {
+        const res = await request(app)
+            .get(`/companies`)
+            .query({ minEmployees: 2, que: "que?" });
+        expect(res.statusCode).toEqual(400);
+    });
 
     test("fails: test next() handler", async function() {
         // there's no normal failure event which will cause this route to fail ---
@@ -249,7 +255,7 @@ describe("GET /companies/:handle", function() {
 /************************************** PATCH /companies/:handle */
 
 describe("PATCH /companies/:handle", function() {
-    test("works for admins", async function() {
+    test("works for admin", async function() {
         const resp = await request(app)
             .patch(`/companies/c1`)
             .send({
