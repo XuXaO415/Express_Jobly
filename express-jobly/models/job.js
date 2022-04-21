@@ -130,6 +130,7 @@ class Job {
             WHERE id = ${idVarIdx}
             RETURNING id, title, salary, equity, company_handle AS "companyHandle"`;
         const result = await await db.query(querySql, [...values, id]);
+        console.log(setCols);
         const job = result.rows[0];
         if (!job) throw new NotFoundError(`Job: ${id} not found`);
         return job;

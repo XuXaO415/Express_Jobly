@@ -90,9 +90,9 @@ router.get("/:id", async function(req, res, next) {
  * 
  *  Update in job.update
  */
-router.patch("/:id", async function(req, res, next) {
+router.patch("/:id", ensureAdmin, async function(req, res, next) {
     try {
-        console.log(req.body);
+        // console.log(req.body);
         const validator = jsonschema.validate(req.body, jobUpdateSchema);
         if (!validator.valid) {
             const errs = validator.errors.map(e => e.stack);
