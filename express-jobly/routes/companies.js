@@ -117,9 +117,9 @@ router.get("/:handle", async function(req, res, next) {
  *
  * Returns { handle, name, description, numEmployees, logo_url }
  *
- * Authorization required: admin
+ * Authorization required: admin -- ensureAdmin
  * /companies/anderson-arias-morrow
- * ensureAdmin
+ * 
  */
 
 router.patch("/:handle", ensureAdmin, async function(req, res, next) {
