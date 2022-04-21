@@ -30,7 +30,6 @@ afterAll(commonAfterAll);
  * -- Re-wrote tests for this section
  */
 
-
 describe("POST /jobs", function() {
     test("ok for admin", async function() {
         const resp = await request(app)
@@ -175,58 +174,46 @@ describe("GET /jobs", function() {
         });
     });
 
-    test("works: filter by title", async function() {
-        // const res = await request(app).get(`/jobs?title=j1`);
+    test("works: filter by hasEquity", async function() {
+        // const res = await request(app).get(`/jobs?hasEquity=null`);
         const res = await request(app)
             .get(`/jobs`)
-            .query({ title: "j1" });
+            .query({ hasEquity: true });
         expect(res.body).toEqual({
             jobs: [{
-                id: expect.any(Number),
-                title: "J1",
-                salary: 1,
-                equity: "0.1",
-                companyHandle: "c1",
-                companyName: "C1",
-            }, ],
+                    id: expect.any(Number),
+                    title: "J1",
+                    salary: 1,
+                    equity: "0",
+                    companyHandle: "c1",
+                    companyName: "C1",
+                },
+                {
+                    id: expect.any(Number),
+                    title: "J2",
+                    salary: 2,
+                    equity: null,
+                    companyHandle: "c1",
+                    companyName: "C1",
+                },
+            ],
         });
-        const res2 = await request(app)
-            .get(`/jobs?title=a`);
-        expect(res.statusCode).toEqual({
-            jobs: []
-        });
+        // const res2 = await request(app)
+        //     .get(`/jobs?title=a`);
+        // expect(res.statusCode).toEqual({
+        //     jobs: []
+        // });
     });
 
     test("filter for minSalary", async function() {
         const res = await request(app)
-            .get(`/jobs?minSalary=2454`);
+            .get(`/jobs?minSalary=100`);
         expect(res.body).toEqual({
             jobs: [{
                 id: expect.any(Number),
                 title: "J2",
-                salary: 2,
+                salary: 100,
                 equity: "0.2",
-                companyHandle: "c1",
-                companyName: "C1",
-            }],
-        });
-    });
-
-    test("filter hasEquity", async function() {
-        const res = await request(app)
-            .get(`/jobs?hasEquity=true`);
-        expect(res.body).toEqual({
-            jobs: [{
-                id: expect.any(Number),
-                title: "J2",
-                salary: 2,
-                equity: "0.2",
-                companyHandle: "c1",
-            }, {
-                id: expect.any(Number),
-                title: "J1",
-                salary: 1,
-                equity: "0.1",
                 companyHandle: "c1",
                 companyName: "C1",
             }],
@@ -242,20 +229,41 @@ describe("GET /jobs", function() {
 
 /************************************** GET /jobs/:id */
 
-describe("GET / jobs/:id", function() {
+// describe("GET / jobs/:id", function() {
+//     test("works for anon", async function() {
+//         let results =
+//             await db.query(`SELECT id FROM jobs WHERE title ="j1"`)
+//         const res = await request(app)
+//             .get(`/jobs/${results.rows[0].id}`);
+//         expect(res.body).toEqual({
+//             job: {
+//                 id: expect.any(Number),
+//                 title: "j1",
+//                 salary: 1,
+//                 equity: "0.1",
+//                 companyHandle: "c1"
+//             }
+//         });
+//     });
+
+
+describe("GET /jobs/:id", function() {
     test("works for anon", async function() {
-        let results =
-            await db.query(`SELECT id FROM jobs WHERE title ="j1"`)
-        const res = await request(app)
-            .get(`/jobs/${results.rows[0].id}`);
-        expect(res.body).toEqual({
+        const resp = await request(app).get(`/jobs/${testJobIds[0]}`);
+        expect(resp.body).toEqual({
             job: {
-                id: expect.any(Number),
-                title: "j1",
+                id: testJobIds[0],
+                title: "J1",
                 salary: 1,
                 equity: "0.1",
-                companyHandle: "c1"
-            }
+                company: {
+                    handle: "c1",
+                    name: "C1",
+                    description: "Desc1",
+                    numEmployees: 1,
+                    logoUrl: "http://c1.img",
+                },
+            },
         });
     });
     test("not found for no such job", async function() {
