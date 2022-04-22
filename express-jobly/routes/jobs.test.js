@@ -177,25 +177,25 @@ describe("GET /jobs", function() {
     test("works: filter by hasEquity", async function() {
         // const res = await request(app).get(`/jobs?hasEquity=null`);
         const res = await request(app)
-            .get(`/jobs`)
-            .query({ hasEquity: true });
+            .get(`/jobs?hasEquity=true`)
+            // .query({ hasEquity: true });
         expect(res.body).toEqual({
             jobs: [{
                     id: expect.any(Number),
                     title: "J1",
                     salary: 1,
-                    equity: "0",
+                    equity: "0.1",
                     companyHandle: "c1",
                     companyName: "C1",
                 },
-                {
-                    id: expect.any(Number),
-                    title: "J2",
-                    salary: 2,
-                    equity: null,
-                    companyHandle: "c1",
-                    companyName: "C1",
-                },
+                // {
+                //     id: expect.any(Number),
+                //     title: "J2",
+                //     salary: 2,
+                //     equity: null,
+                //     companyHandle: "c1",
+                //     companyName: "C1",
+                // },
             ],
         });
         // const res2 = await request(app)
@@ -207,12 +207,13 @@ describe("GET /jobs", function() {
 
     test("filter for minSalary", async function() {
         const res = await request(app)
-            .get(`/jobs?minSalary=100`);
+            // .get(`/jobs?minSalary=100`);
+            .get(`/jobs/${testJobIds[1]}`);
         expect(res.body).toEqual({
             jobs: [{
                 id: expect.any(Number),
                 title: "J2",
-                salary: 100,
+                salary: 1000,
                 equity: "0.2",
                 companyHandle: "c1",
                 companyName: "C1",
@@ -220,10 +221,21 @@ describe("GET /jobs", function() {
         });
     });
 
+
     test("not found for no such job", async function() {
         const res = await request(app)
-            .get(`/jobs?name=nope`)
+            .get(`/job?title=nope`)
         expect(res.statusCode).toEqual(404);
+    });
+    test("fails: test next() handler", async function() {
+        // there's no normal failure event which will cause this route to fail ---
+        // thus making it hard to test that the error-handler works with it. This
+        // should cause an error, all right :)
+        await db.query("DROP TABLE jobs CASCADE");
+        const resp = await request(app)
+            .get("/jobs")
+            .set("authorization", `Bearer ${u1Token}`);
+        expect(resp.statusCode).toEqual(500);
     });
 });
 
@@ -266,6 +278,13 @@ describe("GET /jobs/:id", function() {
             },
         });
     });
+
+    test("filter by id", async function() {
+        const res = await request(app)
+            .get(`/jobs/${testJobIds[1]}`)
+        expect(res.statusCode).toEqual(200);
+
+    })
     test("not found for no such job", async function() {
         const resp = await request(app).get(`/jobs/0`);
         expect(resp.statusCode).toEqual(404);
@@ -273,6 +292,68 @@ describe("GET /jobs/:id", function() {
 });
 
 /************************************** PATCH /jobs/:id */
+describe("PATCH /jobs/:id", function() {
+    test("works for admin", async function() {
+        const res = await request(app)
+            .patch(`/jobs/${testJobIds[1]}`)
+            .send({
+                title: "Senior muffin eater"
+            })
+            .set("Authorization", `Bearer ${adminToken}`);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toEqual({
+            job: {
+                id: expect.any(Number),
+                title: "Senior muffin eater",
+                salary: 2,
+                equity: "0.2",
+                companyHandle: "c1",
+            },
+        });
+    });
+    test("unauth for anon", async function() {
+        const res = await request(app)
+            .patch(`/jobs/${testJobIds[1]}`)
+            .send({
+                title: "oof, nada",
+            })
+            .set("authorization", `Bearer ${u1Token}`);
+        expect(res.statusCode).toEqual(401)
+    });
+    test("responds w/t 404 if job not found", async function() {
+        const res = await request(app)
+            .patch(`/jobs/0`)
+            .send({
+                title: "job doesn't exist"
+            })
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(res.statusCode).toEqual(404);
+    });
+});
 
 /************************************** DELETE /jobs/:id */
-/************************************** DELETE /jobs/:id */
+
+describe("DELETE /jobs/:id", function() {
+    test("deletes jobs: works for admin", async function() {
+        const res = await request(app)
+            .delete(`/jobs/${testJobIds[0]}`)
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(res.statusCode).toEqual(200);
+    });
+    test("unauth for anon", async function() {
+        const res = await request(app)
+            .delete(`/jobs/${testJobIds[0]}`)
+            .set("authorization", `Bearer ${u1Token}`)
+        expect(res.statusCode).toEqual(401)
+    });
+    test("unauth for users", async function() {
+        const resp = await request(app).delete(`/jobs/${testJobIds[0]}`);
+        expect(resp.statusCode).toEqual(401);
+    });
+    test("responds w/t 404 if job not found", async function() {
+        const res = await request(app)
+            .delete(`/jobs/0`)
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(res.statusCode).toEqual(404);
+    });
+});
